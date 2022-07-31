@@ -1,12 +1,14 @@
 import { User } from '../models/user.model.js';
 import { sendMail } from '../utils/sendMail.js';
 import jwt from 'jsonwebtoken';
+import cloudinary from 'cloudinary';
+import fs from 'fs';
 
 export const register = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
 
-        // const avatar = req.files;
+        // const avatar = req.files.avatar.tempFilePath;
 
         let user = await User.findOne({ email });
 
@@ -17,15 +19,22 @@ export const register = async (req, res, next) => {
             });
         }
 
-        const otp = Math.floor(Math.random() * 1000000);
+        const otp = Math.floor(Math.random() * 1000000); 
+
+        // const myCloud = await cloudinary.v2.uploader.upload(avatar);
+
+        // fs.rmSync('./tmp', { recursive: true });
 
         user = await User.create({
             name,
             email,
             password,
             avatar: {
-                public_id: '',
-                url: '',
+                // public_id: myCloud.public_id,
+                public_id: "",
+
+                // url: myCloud.secure_url,
+                url: "",
             },
             otp,
             otp_expiry: new Date(
@@ -276,6 +285,7 @@ export const updateProfile = async (req, res) => {
 
         const { name } = req.body;
         const avatar = req.files.avatar.tempFilePath;
+        console.log(avatar);
 
         if (name) user.name = name;
         if (avatar) {
