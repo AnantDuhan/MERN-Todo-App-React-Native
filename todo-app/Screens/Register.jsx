@@ -7,6 +7,8 @@ import {
 } from 'react-native';
 import { Avatar, Button } from 'react-native-paper';
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { register } from '../redux/actions';
 import mime from 'mime';
 
 const Register = ({ navigation, route }) => {
@@ -15,6 +17,8 @@ const Register = ({ navigation, route }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const dispatch = useDispatch();
 
     const handleImage = () => {
         navigation.navigate('camera', {
@@ -32,6 +36,7 @@ const Register = ({ navigation, route }) => {
             type: mime.getType(avatar),
             name: avatar.split('/').pop(),
         });
+        dispatch(register(myForm));
         console.log("Kuch hua??")
     }
 

@@ -1,19 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Footer from './Components/Footer';
+import Loader from './Components/Loader';
+
 import Home from './Screens/Home';
 import Login from './Screens/Login';
-import Footer from './Components/Footer';
 import Profile from './Screens/Profile';
 import Register from './Screens/Register';
 import Camera from './Screens/Camera';
+import Verify from './Screens/Verify';
+import ResetPassword from './Screens/ResetPassword';
+import ForgetPassword from './Screens/ForgetPassword';
+import ChangePassword from './Screens/ChangePassword';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUser } from './redux/actions';
 
 const Stack = createNativeStackNavigator();
 
 const Main = () => {
-  return (
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(loadUser());
+    }, [dispatch]);
+
+    const { isAuthenticated, loading } = useSelector((state) => state.auth);
+
+  return loading ? (
+      <Loader />
+  ) : (
       <NavigationContainer>
-          <Stack.Navigator initialRouteName="login">
+          <Stack.Navigator
+              initialRouteName={isAuthenticated ? 'home' : 'login'}
+          >
               <Stack.Screen
                   name="home"
                   component={Home}
@@ -30,8 +52,8 @@ const Main = () => {
                   options={{ headerShown: false }}
               />
               <Stack.Screen
-                  name="profile"
-                  component={Profile}
+                  name="verify"
+                  component={Verify}
                   options={{ headerShown: false }}
               />
               <Stack.Screen
@@ -39,8 +61,28 @@ const Main = () => {
                   component={Camera}
                   options={{ headerShown: false }}
               />
+              <Stack.Screen
+                  name="profile"
+                  component={Profile}
+                  options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                  name="changepassword"
+                  component={ChangePassword}
+                  options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                  name="forgetpassword"
+                  component={ForgetPassword}
+                  options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                  name="resetpassword"
+                  component={ResetPassword}
+                  options={{ headerShown: false }}
+              />
           </Stack.Navigator>
-          <Footer />
+          {isAuthenticated && <Footer />}
       </NavigationContainer>
   );
 }

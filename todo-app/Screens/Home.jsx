@@ -9,38 +9,45 @@ import {
     TextInput,
     ScrollView,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Task from '../Components/Task';
 import Icon from 'react-native-vector-icons/Entypo';
 import { Dialog, Button } from 'react-native-paper';
+import { useDispatch, useSelector } from 'react-redux';
+import { addTask, loadUser } from '../redux/actions';
 
 const Home = ({ navigation }) => {
+    const { user } = useSelector((state) => state.auth);
+
+    const dispatch = useDispatch();
+
+    const { loading, message, error } = useSelector((state) => state.message);
+
+    const [openDialog, setOpenDialog] = useState(false);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [openDialog, setOpenDialog] = useState(false);
 
     const hideDialog = () => {
         setOpenDialog(!openDialog);
     };
 
     const addTaskHandler = () => {
-        console.log('Kuch toh hua h...');
+        dispatch(addTask(title, description));
+        dispatch(loadUser());
     };
 
-    const tasks = [
-        {
-            title: 'Task 1',
-            description: 'Sample Task 1',
-            status: false,
-            _id: 'vav556sv5s6v456svb5s6v26',
-        },
-        {
-            title: 'Task 2',
-            description: 'Sample Task 2',
-            status: true,
-            _id: 'vav556sv5s6v456svb5s6v56',
-        },
-    ];
+    useEffect(() => {
+        if (error) {
+            alert(error);
+            dispatch({ type: 'clearError' });
+            dispatch({ type: 'clearError' });
+        }
+        if (message) {
+            alert(message);
+            dispatch({ type: 'clearMessage' });
+        }
+    }, [alert, error, message, dispatch]);
+
     return (
         <>
             <View
@@ -54,16 +61,22 @@ const Home = ({ navigation }) => {
                 <ScrollView>
                     <SafeAreaView>
                         <Text style={styles.heading}>All Tasks</Text>
-                        {tasks.map((item) => (
-                            <Task
-                                key={item._id}
-                                title={item.title}
-                                description={item.description}
-                                status={item.status}
-                                taskId={item.taskId}
-                            />
-                        ))}
-                        <TouchableOpacity style={styles.addBtn} onPress={hideDialog}>
+
+                        {user &&
+                            user.tasks.map((item) => (
+                                <Task
+                                    key={item._id}
+                                    title={item.title}
+                                    description={item.description}
+                                    status={item.completed}
+                                    taskId={item._id}
+                                />
+                            ))}
+
+                        <TouchableOpacity
+                            style={styles.addBtn}
+                            onPress={hideDialog}
+                        >
                             <Icon name="add-to-list" size={20} color="#900" />
                         </TouchableOpacity>
                     </SafeAreaView>
@@ -84,6 +97,7 @@ const Home = ({ navigation }) => {
                         value={description}
                         onChangeText={setDescription}
                     />
+
                     <View
                         style={{ flexDirection: 'row', alignItems: 'center' }}
                     >
@@ -93,7 +107,7 @@ const Home = ({ navigation }) => {
                         <Button
                             onPress={addTaskHandler}
                             color="#900"
-                            disabled={!title || !description}
+                            disabled={!title || !description || loading}
                         >
                             ADD
                         </Button>
@@ -124,7 +138,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         alignSelf: 'center',
         marginVertical: 20,
-        elevation: 7,
+        elevation: 5,
     },
     input: {
         backgroundColor: '#fff',
