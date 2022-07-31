@@ -27,3 +27,7 @@ app.use(async (req, res, next) => {
     res.header('Access-Control-Allow-Methods', '*');
     return next();
 });
+
+app.get('/', (req, res) => {
+    res.send('Server is working');
+});
