@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export const connectDB = () => {
     try {
         mongoose
-            .connect(String('mongodb://localhost:27017/MERN-ReactNative'), {
+            .connect(`${process.env.MONGO_URI}`, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
             })
